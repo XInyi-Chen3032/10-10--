@@ -1,27 +1,24 @@
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt
 
-#页面标题，把 [Your Name] 换成你的名字！
-st.title("California Housing Data (1990) by [陈馨怡]")
+# 标题
+st.title("California Housing Data (1990) by 陈馨怡")
 
-#读取csv数据
+# 读取数据
 df = pd.read_csv("housing.csv")
 
-# 滑块：最低房屋中位数价格
+# 房价滑块
 min_house_val = st.slider("Minimal Median House Value", min_value=0, max_value=500001, value=200000)
-
-# 筛选：只保留房价 >= 滑块值的数据
 filtered_df = df[df["median_house_value"] >= min_house_val]
 
+# 子标题
 st.subheader("See more filters in the sidebar:")
 
 # 侧边栏
 with st.sidebar:
-    # 获取所有区位类型
     location_options = df["ocean_proximity"].unique()
-    # 多选框，默认全部选中
     selected_locations = st.multiselect("Choose the location type", location_options, default=location_options)
-    # 收入单选按钮
     income_choice = st.radio("Choose income level", ["Low", "Medium", "High"])
 
 # 根据多选框筛选区位
@@ -39,4 +36,8 @@ elif income_choice == "High":
 st.map(filtered_df)
 
 # 房价直方图，30个分组
-st.histogram(filtered_df["median_house_value"], bins=30)
+fig, ax = plt.subplots()
+ax.hist(filtered_df["median_house_value"], bins=30)
+ax.set_xlabel("Median House Value")
+ax.set_ylabel("Count")
+st.pyplot(fig)
